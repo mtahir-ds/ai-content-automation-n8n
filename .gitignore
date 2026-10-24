@@ -1,0 +1,9 @@
+.env
+*.env
+credentials*.json
+*.key
+*.bak
+.DS_Store
+Thumbs.db
+# raw, unsanitized n8n export (keep only the sanitized file in workflow/)
+workflow/*.raw.json
