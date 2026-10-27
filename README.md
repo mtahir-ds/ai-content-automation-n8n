@@ -4,6 +4,30 @@ An n8n workflow that turns one topic row in Google Sheets into a researched blog
 
 ![Workflow canvas](docs/workflow-canvas.png)
 
+<!-- DEMO VIDEO: when the Loom is recorded, add this line here:
+🎥 **Video walkthrough:** [Watch the 3-minute demo on Loom](YOUR_LOOM_LINK)
+-->
+
+**Quick facts**
+
+| | |
+|---|---|
+| **Input** | One row in a Google Sheet (topic, audience, tone, word count, niche) |
+| **Output** | Blog post, Twitter/X thread, LinkedIn post, Facebook post, YouTube script |
+| **Research** | Live web search (Tavily, top 5 results) before writing |
+| **Safety** | Email approval required before LinkedIn and Facebook posts go live |
+| **Control panel** | Google Sheets, including the prompt templates |
+
+## Who this is for
+
+- **Marketing agencies** producing blogs and social content for several clients, with a different tone and audience per row.
+- **Solo creators and consultants** who want to publish consistently without writing every channel version by hand.
+- **Small businesses** that need a repeatable content pipeline but want a human to approve anything public.
+- **Automation freelancers** looking for a reference architecture for research-grounded, human-in-the-loop AI content.
+
+## What problem it solves
+
+Writing one idea for four or five platforms is repetitive, and unchecked AI writing tends to invent facts. This workflow handles the repetition (one topic becomes every format) and addresses the accuracy problem in three ways: it researches first, it builds the sources list from real URLs, and it holds social posts for human approval.
 
 ## How it works
 
@@ -43,6 +67,15 @@ flowchart TD
 - **Resilience:** retries on the AI and search nodes, and the search step continues with "No sources were found" instead of stopping the run if the search API fails.
 - **Safe defaults:** the WordPress and X (Twitter) nodes are disabled in the exported workflow.
 
+## Customizing it
+
+- **Change tone or style:** edit the prompts in the `AI-Prompts` sheet tab. No workflow changes needed.
+- **Change audience, length or niche per post:** set `audience`, `tone`, `word_count` and `domain_niche` on the topic row.
+- **Swap the AI models:** the blog step uses Gemini and the platform step uses an OpenRouter chat model. Any chat model that follows JSON schemas can replace either one.
+- **Add a platform:** add a row to `AI-Prompts`, extend the platform output schema, and add a branch in the routing node.
+- **Publish to WordPress:** enable the disabled WordPress node and add your credentials. It already receives the HTML version of the blog.
+- **Post to X:** enable the disabled X node. Note that it posts only the first tweet of the thread (see limitations).
+
 ## Tech stack
 
 n8n · Google Gemini (blog step) · OpenRouter chat model, tested with `openai/gpt-4o-mini` (platform step) · Tavily Search API · Google Sheets, Docs, Gmail · LinkedIn API · Facebook Graph API · JSON Schema structured output parsers
@@ -69,6 +102,15 @@ n8n · Google Gemini (blog step) · OpenRouter chat model, tested with `openai/g
    - LinkedIn and Facebook Graph API (only needed to publish)
 4. Leave the workflow **inactive** while testing. Use the **Manual Test Trigger** with exactly one `Pending` row, and keep the two posting nodes disabled or disapprove the emails.
 5. When you are happy with the output, enable the posting nodes and activate the workflow.
+
+## Repository structure
+
+| Path | Contents |
+|---|---|
+| `workflow/` | The sanitized n8n workflow export to import |
+| `sample-data/` | Starter data for the `content-generation-topics` and `AI-Prompts` sheet tabs |
+| `docs/` | Screenshots and an unedited sample run (`sample-output.md`) |
+| `scripts/sanitize_workflow.py` | Cleans a raw n8n export before publishing: strips credential and instance IDs, replaces Sheet, Drive and LinkedIn IDs and email addresses with placeholders, then scans for anything that still looks like a secret |
 
 ## Google Sheet format
 
@@ -112,6 +154,14 @@ See [`docs/sample-output.md`](docs/sample-output.md) for one unedited run (blog,
 
 ![Facebook post](docs/facebook-post.png)
 
+## Roadmap
+
+- [ ] Post the full Twitter/X thread as a reply chain
+- [ ] Format headings in the blog Google Doc (currently plain text)
+- [ ] Enforce the meta description length (155 characters target)
+- [ ] Add an image-generation step for blog and social visuals
+- [ ] Move placeholders to n8n variables so no JSON editing is needed before import
+
 ## Known limitations
 
 - **AI output can still be wrong.** Even with search and grounding rules, the model sometimes adds a detail that no source states or misattributes a fact. This is why the social posts need approval and the blog should be read before it is published.
@@ -127,3 +177,13 @@ See [`docs/sample-output.md`](docs/sample-output.md) for one unedited run (blog,
 
 **Muhammad Tahir** · AI automation and data science
 [LinkedIn](https://linkedin.com/in/muhammad-tahir-data)  · [GitHub](https://github.com/mtahir-ds)
+
+## Need something similar?
+
+I build n8n automations for businesses, from content pipelines to WhatsApp assistants and lead workflows.
+
+- 📧 mtahir.data@gmail.com
+- 💼 [LinkedIn](https://linkedin.com/in/muhammad-tahir-data)
+- 🐙 [GitHub](https://github.com/mtahir-ds)
+
+If this repo helped you, a ⭐ is appreciated.
